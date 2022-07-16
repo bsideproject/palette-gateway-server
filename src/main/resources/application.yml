@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    default: dev
+    group:
+      dev: dev
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "gateway"
+  endpoint:
+    gateway:
+      enabled: true
