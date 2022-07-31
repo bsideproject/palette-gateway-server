@@ -1,0 +1,26 @@
+#spring:
+#  config:
+#    activate:
+#      on-profile: dev
+#    import: 'aws-parameterstore:'
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: api-service
+#          uri: http://api-server:8082
+#          predicates:
+#            - Path=/graphql
+#          filters:
+#            #              - RewritePath=/graphql
+#            - JwtAuthenticationGatewayFilterFactory
+#          metadata:
+#            connect-timeout: 5000
+#            response-timeout: 5000
+#
+#aws:
+#  paramstore:
+#    enabled: true
+#    prefix: /config
+#    profile-separator: '-'
+#    name: app-palette
+#    fail-fast: true
