@@ -1,32 +1,23 @@
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: local
   cloud:
     gateway:
-#      httpclient: # 글로벌 설정
-#        connect-timeout: 5000 # ms
-#        response-timeout: 5s
+      #      httpclient: # 글로벌 설정
+      #        connect-timeout: 5000 # ms
+      #        response-timeout: 5s
       routes:
-        -   id: auth-service
-            uri: http://localhost:8081
-            predicates:
-              - Path=/auth/v1/**
-          #              - Before=2020-08-20T19:25:19.126+09:00[Asia/Seoul] # 특정 날짜 이전에 호출 가능
-          #              - Between=2020-08-17T19:25:19.126+09:00[Asia/Seoul], 2020-08-20T19:25:19.126+09:00[Asia/Seoul] # 특정 날짜 사이에 호출 가능
-          #              - After=2022-07-16T17:59:00.126+09:00[Asia/Seoul] # 특정 날짜 이후에 호출 가능
-            filters:
-              - RewritePath=/auth/v1/(?<path>.*),/$\{path}
-            metadata:
-              connect-timeout: 5000 # ms
-              response-timeout: 5000 # ms
-
-        -   id: api-service
-            uri: http://localhost:8082
-            predicates:
-              - Path=/api/v1/**
-            filters:
-              - RewritePath=/api/v1/(?<path>.*),/$\{path}
-            metadata:
-              connect-timeout: 5000
-              response-timeout: 5000
+        - id: api-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/graphql
+          filters:
+            - name: JwtAuthentication
+          #            - args:
+          #                baseMessage: My Custom Message
+          #                preLogger: true
+          #                postLogger: true
+          metadata:
+            connect-timeout: 5000
+            response-timeout: 5000
