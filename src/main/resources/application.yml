@@ -1,9 +1,15 @@
 spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway-service
   profiles:
-    default: dev
+    default: local
     group:
+      local: local
       dev: dev
 
+# actuator/gateway/routes 경로를 통하여 정보 확인 가능
 management:
   endpoints:
     web:
