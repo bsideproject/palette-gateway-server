@@ -23,11 +23,12 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilterFactory<Config> {
 
-    private static final String GRAPHQL_URL = "graphql";
+    private static final String GRAPHQL_URL = "/graphql";
     private static final String TOKEN_EXTENSION_URL = "token";
     private static final String REFRESH_TOKEN_COOKIE_NAME = "PTOKEN_REFRESH";
     private static final String MISSING_HEADER_MESSAGE = "missing authorization header";
     private static final String INVALID_HEADER_MESSAGE = "invalid authorization header";
+    private static final String BEARER_TYPE = "Bearer";
 
     private static final List<String> TOKEN_CHECK_REST_API = List.of();
 
@@ -47,6 +48,8 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
             String token = extractToken(request);
 
             String path = request.getURI().getPath();
+            log.info("path: {}", path);
+            log.info("token: {}", token);
             if (GRAPHQL_URL.equals(path)) {
                 if (!containsAuthorization(request)) {
                     return onError(response, MISSING_HEADER_MESSAGE,
@@ -102,9 +105,22 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
     }
 
     private String extractToken(ServerHttpRequest request) {
-        return request.getHeaders().getOrEmpty(HttpHeaders.AUTHORIZATION).get(0);
+        List<String> auths = request.getHeaders().getOrEmpty(HttpHeaders.AUTHORIZATION);
+        if (auths.size() < 1) {
+            return "";
+        }
+        String auth = auths.get(0);
+        if ((auth.toLowerCase().startsWith(BEARER_TYPE.toLowerCase()))) {
+            String authHeaderValue = auth.substring(BEARER_TYPE.length()).trim();
+            String token = auth.substring(0, BEARER_TYPE.length()).trim();
+            int commaIndex = authHeaderValue.indexOf(',');
+            if (commaIndex > 0) {
+                authHeaderValue = authHeaderValue.substring(0, commaIndex);
+            }
+            return authHeaderValue;
+        }
+        return "";
     }
-
 
     private Mono<Void> onError(ServerHttpResponse response, String message, HttpStatus status) {
         response.setStatusCode(status);

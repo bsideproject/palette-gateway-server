@@ -30,12 +30,3 @@ aws:
     profile-separator: '-'
     name: app-palette
     fail-fast: true
-
-security:
-  jwt:
-    access-token:
-      secret-key: test
-      expire-length: 300000
-    refresh-token:
-      secret-key: test
-      expire-length: 3600000
