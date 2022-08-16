@@ -1,5 +1,6 @@
 spring:
   main:
+    banner-mode: off
     web-application-type: reactive
   application:
     name: gateway-service
@@ -19,3 +20,9 @@ management:
   endpoint:
     gateway:
       enabled: true
+
+# ===============================
+# = server config
+# ===============================
+server:
+  port: 8080
