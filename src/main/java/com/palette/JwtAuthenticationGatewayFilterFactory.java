@@ -4,6 +4,7 @@ import com.palette.JwtAuthenticationGatewayFilterFactory.Config;
 import com.palette.infra.jwt.JwtTokenType;
 import com.palette.infra.jwt.JwtUtils;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -25,6 +26,10 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
     private static final String GRAPHQL_URL = "graphql";
     private static final String TOKEN_EXTENSION_URL = "token";
     private static final String REFRESH_TOKEN_COOKIE_NAME = "PTOKEN_REFRESH";
+    private static final String MISSING_HEADER_MESSAGE = "missing authorization header";
+    private static final String INVALID_HEADER_MESSAGE = "invalid authorization header";
+
+    private static final List<String> TOKEN_CHECK_REST_API = List.of();
 
     private final JwtUtils jwtUtils;
 
@@ -32,7 +37,6 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
         super(Config.class);
         this.jwtUtils = jwtUtils;
     }
-
 
     @Override
     public GatewayFilter apply(Config config) {
@@ -45,21 +49,35 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
             String path = request.getURI().getPath();
             if (GRAPHQL_URL.equals(path)) {
                 if (!containsAuthorization(request)) {
-                    return onError(response, "missing authorization header",
+                    return onError(response, MISSING_HEADER_MESSAGE,
                         HttpStatus.UNAUTHORIZED);
                 }
 
                 if (!jwtUtils.validateToken(token, JwtTokenType.ACCESS_TOKEN)) {
-                    return onError(response, "invalid authorization header",
+                    return onError(response, INVALID_HEADER_MESSAGE,
                         HttpStatus.UNAUTHORIZED);
                 }
             } else {
+                for (String a : TOKEN_CHECK_REST_API) {
+                    if (a.equals(path)) {
+                        if (!containsAuthorization(request)) {
+                            return onError(response, MISSING_HEADER_MESSAGE,
+                                HttpStatus.UNAUTHORIZED);
+                        }
+
+                        if (!jwtUtils.validateToken(token, JwtTokenType.ACCESS_TOKEN)) {
+                            return onError(response, INVALID_HEADER_MESSAGE,
+                                HttpStatus.UNAUTHORIZED);
+                        }
+                    }
+                }
+
                 if (TOKEN_EXTENSION_URL.equals(path)) {
                     String cookieName = getRefreshTokenByCookie(request);
                     if (StringUtils.hasText(cookieName) && REFRESH_TOKEN_COOKIE_NAME.equals(
                         cookieName)) {
                         if (!jwtUtils.validateToken(token, JwtTokenType.REFRESH_TOKEN)) {
-                            return onError(response, "invalid authorization header",
+                            return onError(response, INVALID_HEADER_MESSAGE,
                                 HttpStatus.UNAUTHORIZED);
                         }
                     }
@@ -69,6 +87,7 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
             return chain.filter(exchange);
         });
     }
+
 
     private String getRefreshTokenByCookie(ServerHttpRequest request) {
         HttpCookie cookie = request.getCookies().getFirst(REFRESH_TOKEN_COOKIE_NAME);
