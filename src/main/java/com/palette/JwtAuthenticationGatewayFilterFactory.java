@@ -12,6 +12,7 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -24,13 +25,14 @@ import reactor.core.publisher.Mono;
 public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilterFactory<Config> {
 
     private static final String GRAPHQL_URL = "/graphql";
-    private static final String TOKEN_EXTENSION_URL = "token";
+    private static final String TOKEN_EXTENSION_API = "/token";
     private static final String REFRESH_TOKEN_COOKIE_NAME = "PTOKEN_REFRESH";
     private static final String MISSING_HEADER_MESSAGE = "missing authorization header";
     private static final String INVALID_HEADER_MESSAGE = "invalid authorization header";
     private static final String BEARER_TYPE = "Bearer";
 
-    private static final List<String> TOKEN_CHECK_REST_API = List.of();
+    private static final List<String> TOKEN_CHECK_REST_API = List.of("/api/v1/upload",
+        "/api/v1/file");
 
     private final JwtUtils jwtUtils;
 
@@ -48,7 +50,9 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
             String token = extractToken(request);
 
             String path = request.getURI().getPath();
-            log.info("path: {}", path);
+            HttpMethod method = request.getMethod();
+
+            log.info("path: {}, method: {}", path, method);
             log.info("token: {}", token);
             if (GRAPHQL_URL.equals(path)) {
                 if (!containsAuthorization(request)) {
@@ -75,7 +79,7 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
                     }
                 }
 
-                if (TOKEN_EXTENSION_URL.equals(path)) {
+                if (TOKEN_EXTENSION_API.equals(path)) {
                     String cookieName = getRefreshTokenByCookie(request);
                     if (StringUtils.hasText(cookieName) && REFRESH_TOKEN_COOKIE_NAME.equals(
                         cookieName)) {
