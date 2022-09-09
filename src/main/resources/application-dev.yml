@@ -40,3 +40,13 @@ aws:
     profile-separator: '-'
     name: app-palette
     fail-fast: true
+
+# ===============================
+# = eureka
+# ===============================
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
