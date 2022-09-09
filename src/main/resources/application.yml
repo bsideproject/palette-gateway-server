@@ -3,7 +3,7 @@ spring:
     banner-mode: off
     web-application-type: reactive
   application:
-    name: gateway-service
+    name: gateway-server
   profiles:
     default: local
     group:

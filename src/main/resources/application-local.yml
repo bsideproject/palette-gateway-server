@@ -9,8 +9,8 @@ spring:
       #        connect-timeout: 5000 # ms
       #        response-timeout: 5s
       routes:
-        - id: api-service
-          uri: http://localhost:8082
+        - id: api-server
+          uri: lb://API-SERVER:8082
           predicates:
             - Path=/graphql, /api/v1/**
           filters:
@@ -23,6 +23,9 @@ spring:
             connect-timeout: 5000
             response-timeout: 5000
 
+# ==============================
+# = aws
+# ==============================
 aws:
   paramstore:
     enabled: true
@@ -30,3 +33,13 @@ aws:
     profile-separator: '-'
     name: app-palette
     fail-fast: true
+
+# ===============================
+# = eureka
+# ===============================
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
