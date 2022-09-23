@@ -7,7 +7,7 @@ spring:
     gateway:
       routes:
         - id: api-service
-          uri: http://api-server:8082
+          uri: http://api-server-dev:8082 # docker container name
           predicates:
             - Path=/graphql, /api/v1/**
           filters:
