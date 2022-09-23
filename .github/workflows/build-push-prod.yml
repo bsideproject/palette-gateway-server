@@ -1,4 +1,4 @@
-# build-push-dev.yml(1)
+# build-push-dev.yml(1).
 name: 'build-push-prod'
 
 on:
