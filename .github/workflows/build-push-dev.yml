@@ -1,10 +1,12 @@
-# build-push.yml(1)
-name: 'build-push'
+# build-push-dev.yml(1)
+name: 'build-push-dev'
 
 on:
   push:
     branches: [ "develop" ]
 #  pull_request:
+#    types:
+#      - closed
 #    branches: [ "develop" ]
 
 jobs:

@@ -1,0 +1,92 @@
+# build-push-dev.yml(1)
+name: 'build-push-prod'
+
+on:
+  push:
+    branches: [ "main" ]
+#  pull_request:
+#    types:
+#      - closed
+#    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: build
+    steps:
+      # 코드 저장소로 부터 CI 서버로 코드 pull
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # gradle 빌드 실행을 위한 권한을 부여
+      - name: grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: gradle build
+        run: ./gradlew clean build
+
+      # private 저장소일경우 로그인 필요
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build docker
+        run: ./gradlew bootBuildImage --imageName=${{ secrets.DOCKER_REPO }}
+
+      - name: Docker push
+        run: |
+          docker tag ${{secrets.DOCKER_REPO}}:latest ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}:latest
+          docker push ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
+
+      - name: action-slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          author_name: build & docker push # default: 8398a7@action-slack
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.
+
+  deploy:
+    needs: build
+    name: deploy
+    runs-on: [ self-hosted,  gateway-server, prod ]
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_TOKEN}}
+
+      - name: docker-compose.yml run
+        run: |
+          cd /home/prod-server/gateway-server
+          docker-compose down
+          if [ -z $(docker images -qf reference='${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}') ]; then
+            echo "not search docker images"
+            exit 1
+          else
+            docker rmi -f ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
+            echo "docker images remove success"
+            docker-compose up --build -d
+            echo "docker-compose start success"
+          fi
+
+      - name: action-slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          author_name: docker pull & deploy # default: 8398a7@action-slack
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.

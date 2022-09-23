@@ -1,0 +1,52 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import: 'aws-parameterstore:'
+  cloud:
+    gateway:
+      routes:
+        - id: api-service
+          uri: lb://API-SERVER
+          predicates:
+            - Path=/graphql, /api/v1/**
+          filters:
+            - name: JwtAuthentication
+          metadata:
+            connect-timeout: 5000
+            response-timeout: 5000
+
+  # ===============================
+  # = logging
+  # ===============================
+#logging:
+#  pattern:
+#    file: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
+#    console: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
+#  logback:
+#    rollingpolicy:
+#      file-name-pattern: '${LOG_FILE}.%d{yyyy-MM-dd}.%i.log'
+#      max-history: 30
+#  file:
+#    name: ./server/logs/gateway.log
+#  level:
+#    root: INFO
+#    org.springframework.web: INFO
+
+aws:
+  paramstore:
+    enabled: true
+    prefix: /config
+    profile-separator: '-'
+    name: app-palette
+    fail-fast: true
+
+# ===============================
+# = eureka
+# ===============================
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${eureka.url}
+    fetch-registry: true
+    register-with-eureka: true

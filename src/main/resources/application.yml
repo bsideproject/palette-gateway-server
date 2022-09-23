@@ -9,6 +9,7 @@ spring:
     group:
       local: local
       dev: dev
+      prod: prod
 
 # actuator/gateway/routes 경로를 통하여 정보 확인 가능
 management:
@@ -26,3 +27,9 @@ management:
 # ===============================
 server:
   port: 8080
+
+# ===============================
+# = logback
+# ===============================
+logging:
+  config: classpath:logback-spring.xml
