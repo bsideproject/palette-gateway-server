@@ -19,19 +19,19 @@ spring:
   # ===============================
   # = logging
   # ===============================
-logging:
-  pattern:
-    file: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
-    console: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
-  logback:
-    rollingpolicy:
-      file-name-pattern: '${LOG_FILE}.%d{yyyy-MM-dd}.%i.log'
-      max-history: 30
-  file:
-    name: ./server/logs/gateway.log
-  level:
-    root: INFO
-    org.springframework.web: INFO
+#logging:
+#  pattern:
+#    file: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
+#    console: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
+#  logback:
+#    rollingpolicy:
+#      file-name-pattern: '${LOG_FILE}.%d{yyyy-MM-dd}.%i.log'
+#      max-history: 30
+#  file:
+#    name: ./server/logs/gateway.log
+#  level:
+#    root: INFO
+#    org.springframework.web: INFO
 
 aws:
   paramstore:
@@ -50,3 +50,9 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/
     fetch-registry: true
     register-with-eureka: true
+
+# ===============================
+# = server config
+# ===============================
+server:
+  port: 8080
