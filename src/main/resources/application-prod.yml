@@ -45,8 +45,17 @@ aws:
 # = eureka
 # ===============================
 eureka:
+  instance:
+    hostname: ${HOSTNAME} # 각 서버의 IP
+    prefer-ip-address: true
   client:
     serviceUrl:
       defaultZone: ${eureka.url}
     fetch-registry: true
     register-with-eureka: true
+
+# ===============================
+# = server config
+# ===============================
+server:
+  port: ${PORT:8080}

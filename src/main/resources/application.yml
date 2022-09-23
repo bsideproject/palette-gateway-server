@@ -22,11 +22,6 @@ management:
     gateway:
       enabled: true
 
-# ===============================
-# = server config
-# ===============================
-server:
-  port: 8080
 
 # ===============================
 # = logback
