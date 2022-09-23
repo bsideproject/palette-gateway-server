@@ -50,3 +50,9 @@ eureka:
       defaultZone: ${eureka.url}
     fetch-registry: true
     register-with-eureka: true
+
+# ===============================
+# = server config
+# ===============================
+server:
+  port: ${PORT:8080}
