@@ -6,7 +6,7 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: api-service
+        - id: API-SERVER
           uri: lb://API-SERVER
           predicates:
             - Path=/graphql, /api/v1/**
