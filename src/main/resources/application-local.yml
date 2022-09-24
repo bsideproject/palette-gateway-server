@@ -9,8 +9,8 @@ spring:
       #        connect-timeout: 5000 # ms
       #        response-timeout: 5s
       routes:
-        - id: api-server
-          uri: lb://API-SERVER:8082
+        - id: API-SERVER
+          uri: lb://API-SERVER
           predicates:
             - Path=/graphql, /api/v1/**
           filters:
@@ -38,6 +38,9 @@ aws:
 # = eureka
 # ===============================
 eureka:
+  instance:
+    #    hostname: ${HOSTNAME} # 각 서버의 IP
+    prefer-ip-address: true
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/

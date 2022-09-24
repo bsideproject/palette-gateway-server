@@ -45,6 +45,9 @@ aws:
 # = eureka
 # ===============================
 eureka:
+  instance:
+    #    hostname: ${HOSTNAME} # 각 서버의 IP
+    prefer-ip-address: true
   client:
     serviceUrl:
       defaultZone: http://eureka-server:8761/eureka/

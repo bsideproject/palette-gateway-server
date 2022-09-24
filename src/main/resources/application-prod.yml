@@ -46,7 +46,7 @@ aws:
 # ===============================
 eureka:
   instance:
-    hostname: ${HOSTNAME} # 각 서버의 IP
+    #    hostname: ${HOSTNAME} # 각 서버의 IP
     prefer-ip-address: true
   client:
     serviceUrl:
